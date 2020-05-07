@@ -44,7 +44,7 @@ Three examples are given:
   
 - A Python project:
   * pick any name for this project.
-  * give the signature `project_name = ['mail.py','module.py']`.
+  * give the signature `project_signature = ['mail.py','module.py']`.
   * `project_ignores` can be equal to `['do_not_want.md']`.
   
 - A duplicate CMake project:
