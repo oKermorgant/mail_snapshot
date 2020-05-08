@@ -29,7 +29,7 @@ Advanced configuration
 prof_email = 'olivier.kermorgant@ec-nantes.fr'
 smtp_server = 'smtps.nomade.ec-nantes.fr'
 
-# separator between first name and given name in email address
+# separator between first name and last name in email address
 email_sep = '.' 
 
 # ordered fields: project name / student full name / message count / total messages
@@ -138,8 +138,8 @@ else:
 def extract_name(mail):
     name = mail.split('@')[0]
     if email_sep in name:
-        first, given = name.split(email_sep)
-        return '{} {}'.format(given.upper(), first.title())
+        first, last = name.split(email_sep)
+        return '{} {}'.format(last.upper(), first.title())
     else:
         return name.title()
     
