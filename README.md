@@ -20,7 +20,7 @@ Fill in your email address / smtp server. Some advanced parameters can be found 
 A 'project' is the folder that will be zipped. It should be given a name, and should match one of these two conditions to be identified on the student's hard drive:
 
 - if it is a CMake project, then the folder should have the project name and the CMakeLists.txt file should define a project with this name
-- more generally, a list of files (possibly in sub-folders) can be given and will serve a the folder signature
+- more generally, a list of files (possibly in sub-folders) can be given and will serve as the folder signature
 
 A list of ignored files can also be entered: they will not be part of the mailed zip file.
 
