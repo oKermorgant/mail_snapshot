@@ -38,6 +38,11 @@ email_subject = '[Snapshot {}]  {} - #{}/{}'
 # the core of the mail, more or less useless as only the professor will see it
 email_body = 'Automated message'
 
+# know proxies that may be needed
+proxy_candidates = []
+proxy_candidates.append(('http://proxy.irccyn.ec-nantes.fr', 3128))
+proxy_candidates.append(('cache.cites-u.univ-nantes.fr', 3128))
+
 
 # Do not modify below lines
 
@@ -48,25 +53,50 @@ from email.mime.application import MIMEApplication
 from email.utils import formatdate
 from getpass import getpass
 from time import sleep
+try:
+    import socks
+except:
+    print('Socks module not found, please install python-socks or python3-socks')
+    sys.exit(0)
 
 
 if not student_passwd:
     student_passwd = getpass('Enter your password for ' + student_email + ' : ')
 
-def init_server():
+
+def init_server(proxy, port, only_proxy = False):
     try:
+        if proxy:
+            socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS4, proxy, port)
+            socks.wrapmodule(smtplib)
         server = smtplib.SMTP(smtp_server , 587)
         server.starttls()
-        server.login(student_email, student_passwd)
+    except:
+        return None
+    
+    if only_proxy:
+        return True
+    
+    try:
+        server.login(from_email, from_passwd)
         return server
     except smtplib.socket.gaierror:
         print('Could not connect to mail server, check your internet connection')
     except smtplib.SMTPAuthenticationError:
         print('Could not connect to mail server: wrong user/password')
-    return None    
+    return None
+
+# identify proxy
+for proxy,port in [('',0)] + proxy_candidates:
+    server = init_server(proxy, port, True)
+    if server:
+        break
+if not server:
+    print('Could not connect to mail server, check your internet connection and potential proxy')
+    sys.exit(0)
 
 # test login
-if not init_server():
+if not init_server(proxy, port):
     sys.exit(0)
     
 # Find project folder
@@ -201,7 +231,7 @@ for snapshot_count in range(1,mail_total+1):
     email.attach(attached_file)
     
     # send message
-    server = init_server()
+    server = init_server(proxy, port)
     if server:
         print('Sending "{}" to {} ...'.format(email['Subject'], prof_email))
         server.sendmail(student_email, prof_email, email.as_string())
