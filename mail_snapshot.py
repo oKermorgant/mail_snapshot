@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # update the line below to your email
 # if left empty, the password will be asked at runtime (which is good)
