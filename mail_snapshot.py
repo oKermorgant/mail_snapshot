@@ -2,7 +2,7 @@
 
 # update the line below to your email
 # if left empty, the password will be asked at runtime (which is good)
-student_email = 'olivier.kermorgant@ec-nantes.fr'
+student_email = 'first.last@univ.edu'
 student_passwd = ''
 
 # Students: do not modify below lines
@@ -26,7 +26,7 @@ project_ignores = ['do_not_want.md']
 '''
 Advanced configuration
 '''
-prof_email = 'olivier.kermorgant@ec-nantes.fr'
+prof_email = 'prof.email@univ.edu'
 smtp_server = 'smtps.nomade.ec-nantes.fr'
 
 # separator between first name and last name in email address
