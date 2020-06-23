@@ -78,7 +78,7 @@ def init_server(proxy, port, only_proxy = False):
         return True
     
     try:
-        server.login(from_email, from_passwd)
+        server.login(student_email, student_passwd)
         return server
     except smtplib.socket.gaierror:
         print('Could not connect to mail server, check your internet connection')
