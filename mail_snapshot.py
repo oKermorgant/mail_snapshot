@@ -7,7 +7,6 @@ student_passwd = ''
 
 # Students: do not modify below lines
 
-
 '''
 Project identity
 '''
@@ -58,45 +57,56 @@ try:
 except:
     print('Socks module not found, please install python-socks or python3-socks')
     sys.exit(0)
-
-
-if not student_passwd:
-    student_passwd = getpass('Enter your password for ' + student_email + ' : ')
-
-
-def init_server(proxy, port, only_proxy = False):
-    try:
-        if proxy:
-            socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS4, proxy, port)
+    
+    
+class SMTPproxy:
+    def __init__(self):        
+        
+        self.passwd = student_passwd
+        
+        for self.proxy,self.port in [('',0)] + proxy_candidates:
+            try:
+                if self.proxy:
+                    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS4, self.proxy, self.port)
+                    socks.wrapmodule(smtplib)
+                server = smtplib.SMTP(smtp_server , 587)
+                server.starttls()
+                break
+            except:
+                pass            
+        else:
+            self.proxy = self.port = None
+            
+    def ok(self):
+        return self.proxy != None
+            
+    def server(self):
+        if self.proxy:
+            socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS4, self.proxy, self.port)
             socks.wrapmodule(smtplib)
         server = smtplib.SMTP(smtp_server , 587)
         server.starttls()
-    except:
+        
+        if not self.passwd:
+            self.passwd = getpass('Enter your password for ' + student_email + ' : ')
+                
+        try:
+            server.login(student_email, self.passwd)
+            return server
+        except smtplib.socket.gaierror:
+            print('Could not connect to mail server, check your internet connection')
+        except smtplib.SMTPAuthenticationError:
+            print('Could not connect to mail server: wrong user/password')
         return None
     
-    if only_proxy:
-        return True
-    
-    try:
-        server.login(student_email, student_passwd)
-        return server
-    except smtplib.socket.gaierror:
-        print('Could not connect to mail server, check your internet connection')
-    except smtplib.SMTPAuthenticationError:
-        print('Could not connect to mail server: wrong user/password')
-    return None
-
-# identify proxy
-for proxy,port in [('',0)] + proxy_candidates:
-    server = init_server(proxy, port, True)
-    if server:
-        break
-if not server:
+# init SMTP with proxy
+proxy = SMTPproxy()
+if not proxy.ok():
     print('Could not connect to mail server, check your internet connection and potential proxy')
     sys.exit(0)
-
+    
 # test login
-if not init_server(proxy, port):
+if not proxy.server():
     sys.exit(0)
     
 # Find project folder
@@ -231,7 +241,7 @@ for snapshot_count in range(1,mail_total+1):
     email.attach(attached_file)
     
     # send message
-    server = init_server(proxy, port)
+    server = proxy.server()
     if server:
         print('Sending "{}" to {} ...'.format(email['Subject'], prof_email))
         server.sendmail(student_email, prof_email, email.as_string())
